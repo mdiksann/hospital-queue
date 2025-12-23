@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PolyclinicController;
+use App\Http\Controllers\QueueController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -17,3 +18,14 @@ Route::middleware('auth:admin')->group(function () {
     Route::put('/polyclinics/{polyclinic}', [PolyclinicController::class, 'update']);
     Route::delete('/polyclinics/{polyclinic}', [PolyclinicController::class, 'destroy']);
 });
+
+Route::post('/queues', [QueueController::class, 'store']);
+
+Route::middleware('auth:admin')->group(function () {
+    Route::post('/queues/{id}/call', [QueueController::class, 'call']);
+    Route::post('/queues/{id}/done', [QueueController::class, 'done']);
+    Route::post('/queues/{id}/skip', [QueueController::class, 'skip']);
+});
+
+Route::get('/queues', [QueueController::class, 'index'])
+    ->middleware('auth:admin');
