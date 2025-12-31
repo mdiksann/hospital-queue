@@ -21,7 +21,7 @@ class QueueUpdated implements ShouldBroadcastNow
 
     public function broadcastOn(): Channel
     {
-        return new Channel('hospital-queue');
+        return new Channel('queue-screen');
     }
 
     public function broadcastAs(): string
