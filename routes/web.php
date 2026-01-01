@@ -11,6 +11,8 @@ Route::view('/queue-screen', 'queue-screen');
 
 use Inertia\Inertia;
 
-Route::get('/screen/antrian', function () {
-    return Inertia::render('Screen/Antrian');
+Route::get('/screen/antrian/{poliId}', function ($poliId) {
+    return Inertia::render('Screen/Antrian', [
+        'poliId' => (int) $poliId
+    ]);
 });
