@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PolyclinicController;
 use App\Http\Controllers\QueueController;
+use App\Models\Polyclinic;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -29,3 +30,6 @@ Route::middleware('auth:admin')->group(function () {
 
 Route::get('/queues', [QueueController::class, 'index'])
     ->middleware('auth:admin');
+
+// Public route untuk display screen
+Route::get('/display/queues', [QueueController::class, 'displayQueues']);
