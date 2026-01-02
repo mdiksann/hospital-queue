@@ -1,18 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use Inertia\Inertia;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::view('/queue-screen', 'queue-screen');
-
-use Inertia\Inertia;
-
-Route::get('/screen/antrian/{poliId}', function ($poliId) {
-    return Inertia::render('Screen/Antrian', [
-        'poliId' => (int) $poliId
-    ]);
+// Route untuk menampilkan semua antrian poli dalam 1 TV screen
+Route::get('/queue-screen', function () {
+    return Inertia::render('QueueScreen');
 });
