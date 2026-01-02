@@ -21,12 +21,12 @@ class QueueUpdated implements ShouldBroadcastNow
 
     public function broadcastOn(): Channel
     {
-        return new Channel('queue-screen.' . $this->queue['polyclinic_id']);
+        return new Channel('hospital-queue');
     }
 
     public function broadcastAs(): string
     {
-        return 'QueueUpdated';
+        return 'queue.updated';
     }
 
     public function broadcastWith(): array
