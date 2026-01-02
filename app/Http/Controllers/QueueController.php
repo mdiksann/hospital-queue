@@ -7,6 +7,7 @@ use App\Models\Polyclinic;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Events\QueueUpdated;
 
 class QueueController extends Controller
 {
@@ -57,9 +58,30 @@ class QueueController extends Controller
 
     public function call($id)
     {
-        $queue = Queue::where('id', $id)
-            ->where('status', 'waiting')
-            ->firstOrFail();
+
+        $queue = Queue::findOrFail($id);
+
+        if ($queue->status !== 'waiting') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only queues with status waiting can be called.'
+            ], 400);
+        }
+
+        $activeQueue = Queue::where('polyclinic_id', $queue->polyclinic_id)
+            ->where('queue_date', today())
+            ->where('status', 'called')
+            ->exists();
+
+        if ($activeQueue) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Complete the currently called queue before calling a new one.'
+            ], 400);
+        }
+
+        //Trigger event to notify other clients
+        broadcast(new QueueUpdated($queue))->toOthers();
 
         $queue->update([
             'status' => 'called',
@@ -68,7 +90,7 @@ class QueueController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Queue called',
+            'message' => 'Queue ' . $queue->queue_number . ' called.',
             'data' => $queue
         ]);
     }
@@ -83,6 +105,9 @@ class QueueController extends Controller
             'status' => 'done',
             'finished_at' => now()
         ]);
+
+        //Trigger event to notify other clients
+        broadcast(new QueueUpdated($queue))->toOthers();
 
         return response()->json([
             'success' => true,
@@ -101,6 +126,9 @@ class QueueController extends Controller
             'status' => 'skipped',
             'finished_at' => now()
         ]);
+
+        //Trigger event to notify other clients
+        broadcast(new QueueUpdated($queue))->toOthers();
 
         return response()->json([
             'success' => true,
@@ -123,6 +151,23 @@ class QueueController extends Controller
         return response()->json([
             'success' => true,
             'data' => $queues
+        ]);
+    }
+
+    public function displayQueues()
+    {
+        $polyclinics = Polyclinic::where('is_active', true)
+            ->with(['queues' => function ($query) {
+                $query->where('queue_date', today())
+                    ->where('status', 'called')
+                    ->orderBy('called_at', 'desc')
+                    ->limit(1);
+            }])
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $polyclinics
         ]);
     }
 }
