@@ -49,6 +49,12 @@ class QueueController extends Controller
             ]);
         });
 
+        // Load polyclinic relationship
+        $queue->load('polyclinic');
+
+        // Broadcast event for real-time update
+        event(new QueueUpdated($queue->toArray()));
+
         return response()->json([
             'success' => true,
             'message' => 'Queue created',
