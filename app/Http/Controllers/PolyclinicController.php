@@ -57,4 +57,14 @@ class PolyclinicController extends Controller
             'message' => 'Polyclinic deleted'
         ]);
     }
+
+    public function getActivePolyclinics()
+    {
+        return response()->json([
+            'success' => true,
+            'data' => Polyclinic::where('is_active', true)
+                ->orderBy('name')
+                ->get()
+        ]);
+    }
 }
