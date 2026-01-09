@@ -25,19 +25,8 @@ export default function QueueScreen() {
         window.Echo.channel("hospital-queue").listen(".queue.updated", (e) => {
             console.log("Realtime update received:", e);
 
-            // Update state langsung dari event
-            setPolyclinics((prev) => {
-                return prev.map((poly) => {
-                    if (poly.id === e.queue.polyclinic_id) {
-                        return {
-                            ...poly,
-                            queues:
-                                e.queue.status === "called" ? [e.queue] : [],
-                        };
-                    }
-                    return poly;
-                });
-            });
+            // Refresh data setiap kali ada update
+            fetchDisplayData();
         });
 
         return () => {
