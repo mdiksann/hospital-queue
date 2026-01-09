@@ -20,6 +20,10 @@ Route::middleware('auth:admin')->group(function () {
     Route::delete('/polyclinics/{polyclinic}', [PolyclinicController::class, 'destroy']);
 });
 
+// Public route untuk mendapatkan daftar poliklinik yang aktif
+Route::get('/polyclinics/active', [PolyclinicController::class, 'getActivePolyclinics']);
+
+// Public route untuk pasien membuat antrian
 Route::post('/queues', [QueueController::class, 'store']);
 
 Route::middleware('auth:admin')->group(function () {
